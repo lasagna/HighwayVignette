@@ -8,17 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
+    let apiClient: HighwayAPIClient
+
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text("Highway Vignette")
         }
         .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(
+        apiClient: HighwayAPIClient(baseURL: URL(string: "http://0.0.0.0:8080")!)
+    )
 }
