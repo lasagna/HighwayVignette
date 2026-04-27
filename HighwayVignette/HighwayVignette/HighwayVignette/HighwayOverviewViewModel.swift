@@ -2,7 +2,7 @@
 //  HighwayOverviewViewModel.swift
 //  HighwayVignette
 //
-//  Created by Codex on 2026. 04. 24..
+//  Created by Gergo Gombar on 2026. 04. 24..
 //
 
 import Foundation
