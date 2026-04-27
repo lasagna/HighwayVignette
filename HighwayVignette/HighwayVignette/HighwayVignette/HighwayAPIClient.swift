@@ -7,6 +7,12 @@
 
 import Foundation
 
+protocol HighwayAPIClientProviding {
+    func fetchHighwayInfo() async throws -> HighwayInfoResponse
+    func fetchVehicleInfo() async throws -> VehicleInfoResponse
+    func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse
+}
+
 struct HighwayAPIClient {
     let baseURL: URL
     let session: URLSession
@@ -102,6 +108,8 @@ struct HighwayAPIClient {
         return request
     }
 }
+
+extension HighwayAPIClient: HighwayAPIClientProviding {}
 
 enum HighwayAPIError: Error, LocalizedError {
     case invalidURL(String)

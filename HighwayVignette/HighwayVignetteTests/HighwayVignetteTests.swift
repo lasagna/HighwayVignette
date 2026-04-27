@@ -59,4 +59,61 @@ struct HighwayVignetteTests {
         #expect(response.payload.counties.first?.id == "YEAR_11")
     }
 
+    @MainActor
+    @Test func loadsOverviewData() async {
+        let viewModel = HighwayOverviewViewModel(apiClient: MockHighwayAPIClient())
+
+        await viewModel.load()
+
+        #expect(viewModel.state == .loaded)
+        #expect(viewModel.highwayInfo?.payload.highwayVignettes.count == 1)
+        #expect(viewModel.vehicleInfo?.plate == "abc-123")
+    }
+
+}
+
+private struct MockHighwayAPIClient: HighwayAPIClientProviding {
+    func fetchHighwayInfo() async throws -> HighwayInfoResponse {
+        HighwayInfoResponse(
+            requestId: "12345678",
+            statusCode: "OK",
+            payload: HighwayInfoPayload(
+                highwayVignettes: [
+                    HighwayVignetteOption(
+                        vignetteType: ["DAY"],
+                        vehicleCategory: "CAR",
+                        cost: 5150,
+                        trxFee: 200,
+                        sum: 5350
+                    )
+                ],
+                vehicleCategories: [
+                    VehicleCategory(
+                        category: "CAR",
+                        vignetteCategory: "D1",
+                        name: LocalizedText(hu: "Szemelygepjarmu", en: "Car")
+                    )
+                ],
+                counties: [
+                    County(id: "YEAR_11", name: "Bacs-Kiskun")
+                ]
+            )
+        )
+    }
+
+    func fetchVehicleInfo() async throws -> VehicleInfoResponse {
+        VehicleInfoResponse(
+            statusCode: "OK",
+            internationalRegistrationCode: "H",
+            type: "CAR",
+            name: "Michael Scott",
+            plate: "abc-123",
+            country: LocalizedText(hu: "Magyarorszag", en: "Hungary"),
+            vignetteType: "D1"
+        )
+    }
+
+    func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse {
+        HighwayOrderResponse(statusCode: "OK", receivedOrders: requestBody.highwayOrders)
+    }
 }

@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: Highway Vignette API
+  description: API for retrieving and ordering highway vignettes and vehicle info.
+  version: 1.0.0
+servers:
+  - url: http://0.0.0.0:8080
+
+paths:
+  /v1/highway/info:
+    get:
+      summary: Retrieve highway vignette information
+      operationId: getHighwayInfo
+      responses:
+        '200':
+          description: A list of available highway vignettes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    example: 12345678
+                  statusCode:
+                    type: string
+                    example: OK
+                  payload:
+                    type: object
+                    properties:
+                      highwayVignettes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            vignetteType:
+                              type: array
+                              items:
+                                type: string
+                              example: ["DAY"]
+                            vehicleCategory:
+                              type: string
+                              example: CAR
+                            cost:
+                              type: number
+                              format: float
+                              example: 5150.0
+                            trxFee:
+                              type: number
+                              format: float
+                              example: 200.0
+                            sum:
+                              type: number
+                              format: float
+                              example: 5350.0
+                      vehicleCategories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                              example: CAR
+                            vignetteCategory:
+                              type: string
+                              example: D1
+                            name:
+                              type: object
+                              properties:
+                                hu:
+                                  type: string
+                                  example: Személygépjármű
+                                en:
+                                  type: string
+                                  example: Car
+                      counties:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: YEAR_11
+                            name:
+                              type: string
+                              example: Bács-Kiskun
+        '404':
+          description: Endpoint not found
+
+  /v1/highway/vehicle:
+    get:
+      summary: Retrieve vehicle information
+      operationId: getVehicleInfo
+      responses:
+        '200':
+          description: Returns vehicle registration info.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                    example: OK
+                  internationalRegistrationCode:
+                    type: string
+                    example: H
+                  type:
+                    type: string
+                    example: CAR
+                  name:
+                    type: string
+                    example: Michael Scott
+                  plate:
+                    type: string
+                    example: abc-123
+                  country:
+                    type: object
+                    properties:
+                      hu:
+                        type: string
+                        example: Magyarország
+                      en:
+                        type: string
+                        example: Hungary
+                  vignetteType:
+                    type: string
+                    example: D1
+        '404':
+          description: Endpoint not found
+
+  /v1/highway/order:
+    post:
+      summary: Place an order for highway vignettes
+      operationId: postHighwayOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                highwayOrders:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: DAY
+                      category:
+                        type: string
+                        example: CAR
+                      cost:
+                        type: number
+                        format: float
+                        example: 5000
+      responses:
+        '200':
+          description: Returns the status and the received highway orders.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                    example: OK
+                  receivedOrders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: DAY
+                        category:
+                          type: string
+                          example: CAR
+                        cost:
+                          type: number
+                          format: float
+                          example: 5000
+        '400':
+          description: Invalid or missing highway orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: string
+                    example: ERROR
+                  message:
+                    type: string
+                    example: Invalid or missing highwayOrders parameter
+        '404':
+          description: Endpoint not found

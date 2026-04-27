@@ -13,7 +13,7 @@ struct LocalizedText: Codable, Equatable {
 }
 
 struct HighwayInfoResponse: Codable, Equatable {
-    let requestId: String
+    let requestId: Int
     let statusCode: String
     let payload: HighwayInfoPayload
 }
