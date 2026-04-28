@@ -49,7 +49,7 @@ struct VignetteSelectorView: View {
         VStack(spacing: 16) {
             ProgressView()
                 .controlSize(.large)
-            Text("Loading highway data...")
+            Text("Adatok betöltése...")
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -182,11 +182,11 @@ struct VignetteSelectorView: View {
 
     private var failureView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Could not load data")
+            Text("Nem sikerült betölteni az adatokat")
                 .font(.headline)
-            Text(viewModel.errorMessage ?? "Unknown error")
+            Text(viewModel.errorMessage ?? "Ismeretlen hiba")
                 .foregroundStyle(.secondary)
-            Button("Retry") {
+            Button("Újra") {
                 Task {
                     await viewModel.load()
                     selectDefaultVignetteIfNeeded()
@@ -266,13 +266,13 @@ private struct VignetteRow: Identifiable {
     private func displayName(for type: String) -> String {
         switch type.uppercased() {
         case "DAY":
-            return "napi (1 napos)"
+            return String(localized: "napi (1 napos)")
         case "WEEK":
-            return "heti (10 napos)"
+            return String(localized: "heti (10 napos)")
         case "MONTH":
-            return "havi"
+            return String(localized: "havi")
         case "YEAR":
-            return "éves"
+            return String(localized: "éves")
         default:
             return type.lowercased()
         }
