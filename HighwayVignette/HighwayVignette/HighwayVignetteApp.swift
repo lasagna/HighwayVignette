@@ -20,19 +20,23 @@ struct HighwayVignetteApp: App {
     }
 }
 
+private enum AppRoute: Hashable {
+    case vignetteFlow
+}
+
 private struct AppEntryView: View {
     let apiClient: HighwayAPIClient
 
-    @State private var shouldNavigateToVignetteFlow = false
+    @State private var path = NavigationPath()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ZStack {
                 Color(.systemGroupedBackground)
                     .ignoresSafeArea()
 
                 Button {
-                    shouldNavigateToVignetteFlow = true
+                    path.append(AppRoute.vignetteFlow)
                 } label: {
                     Text("E-matrica")
                         .font(.title2.weight(.semibold))
@@ -45,11 +49,14 @@ private struct AppEntryView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .navigationDestination(isPresented: $shouldNavigateToVignetteFlow) {
-                VignetteSelectorView(
-                    apiClient: apiClient,
-                    onFinish: { shouldNavigateToVignetteFlow = false }
-                )
+            .navigationDestination(for: AppRoute.self) { route in
+                switch route {
+                case .vignetteFlow:
+                    VignetteSelectorView(
+                        apiClient: apiClient,
+                        onFinish: { path = NavigationPath() }
+                    )
+                }
             }
         }
     }
