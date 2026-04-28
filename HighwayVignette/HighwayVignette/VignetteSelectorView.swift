@@ -123,7 +123,8 @@ struct VignetteSelectorView: View {
     }
 
     private var countyVignettesCard: some View {
-        Button {
+        NavigationLink {
+            YearlyVignetteSelectorView(viewModel: viewModel)
         } label: {
             HStack {
                 Text("Éves vármegyei matricák")
