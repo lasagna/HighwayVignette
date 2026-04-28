@@ -11,6 +11,7 @@ struct YearlyVignetteSelectorView: View {
     let viewModel: HighwayOverviewViewModel
 
     @State private var selectedCountyNames: Set<String> = []
+    @State private var isShowingConnectivityAlert = false
 
     var body: some View {
         ZStack {
@@ -37,6 +38,7 @@ struct YearlyVignetteSelectorView: View {
                     }
 
                     Button {
+                        handleContinue()
                     } label: {
                         Text("Tovább")
                             .font(.headline.weight(.semibold))
@@ -56,6 +58,10 @@ struct YearlyVignetteSelectorView: View {
         }
         .navigationTitle("E-matrica")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Nem összefüggő kijelölés", isPresented: $isShowingConnectivityAlert) {
+            Button("Rendben", role: .cancel) {
+            }
+        }
     }
 
     private var countyMap: some View {
@@ -157,6 +163,48 @@ struct YearlyVignetteSelectorView: View {
         }
     }
 
+    private func handleContinue() {
+        let disconnectedCountyNames = disconnectedSelectedCountyNames()
+
+        guard !disconnectedCountyNames.isEmpty else {
+            return
+        }
+
+        isShowingConnectivityAlert = true
+    }
+
+    private func disconnectedSelectedCountyNames() -> [String] {
+        let selectedIDs = selectedCountyIDs
+
+        guard selectedIDs.count > 1, let startID = selectedIDs.first else {
+            return []
+        }
+
+        var visited: Set<String> = []
+        var queue: [String] = [startID]
+
+        while let currentID = queue.first {
+            queue.removeFirst()
+
+            guard !visited.contains(currentID) else {
+                continue
+            }
+
+            visited.insert(currentID)
+
+            for neighbor in HungaryCountyMapView.adjacencyGraph[currentID, default: []] where selectedIDs.contains(neighbor) {
+                if !visited.contains(neighbor) {
+                    queue.append(neighbor)
+                }
+            }
+        }
+
+        return selectedIDs
+            .subtracting(visited)
+            .compactMap { Self.countyNameByID[$0] }
+            .sorted()
+    }
+
     private func priceText(_ value: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -173,7 +221,6 @@ struct YearlyVignetteSelectorView: View {
         "Borsod-Abaúj-Zemplén": "baz",
         "Budapest": "budapest",
         "Csongrád": "csongrad",
-        "Csongrád-Csanád": "csongrad",
         "Fejér": "fejer",
         "Győr-Moson-Sopron": "gyms",
         "Hajdú-Bihar": "hb",
@@ -189,6 +236,10 @@ struct YearlyVignetteSelectorView: View {
         "Veszprém": "veszprem",
         "Zala": "zala",
     ]
+
+    private static let countyNameByID: [String: String] = Dictionary(
+        uniqueKeysWithValues: countyIDByName.map { ($1, $0) }
+    )
 }
 
 #Preview {
