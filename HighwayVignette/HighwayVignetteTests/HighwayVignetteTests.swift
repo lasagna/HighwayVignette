@@ -15,7 +15,7 @@ struct HighwayVignetteTests {
     @Test func decodesHighwayInfoResponse() throws {
         let json = """
         {
-          "requestId": "12345678",
+          "requestId": 12345678,
           "statusCode": "OK",
           "payload": {
             "highwayVignettes": [
@@ -52,7 +52,7 @@ struct HighwayVignetteTests {
             from: Data(json.utf8)
         )
 
-        #expect(response.requestId == "12345678")
+        #expect(response.requestId == 12345678)
         #expect(response.statusCode == "OK")
         #expect(response.payload.highwayVignettes.first?.vehicleCategory == "CAR")
         #expect(response.payload.vehicleCategories.first?.vignetteCategory == "D1")
@@ -75,7 +75,7 @@ struct HighwayVignetteTests {
 private struct MockHighwayAPIClient: HighwayAPIClientProviding {
     func fetchHighwayInfo() async throws -> HighwayInfoResponse {
         HighwayInfoResponse(
-            requestId: "12345678",
+            requestId: 12345678,
             statusCode: "OK",
             payload: HighwayInfoPayload(
                 highwayVignettes: [
