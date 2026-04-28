@@ -8,36 +8,37 @@
 import SwiftUI
 
 struct VignetteSelectorView: View {
+    let onFinish: () -> Void
+
     @State private var viewModel: HighwayOverviewViewModel
     @State private var selectedVignetteID: String?
     @State private var shouldNavigateToVignetteConfirmation = false
     @State private var shouldNavigateToYearlySelector = false
 
-    init(apiClient: HighwayAPIClient) {
+    init(apiClient: HighwayAPIClient, onFinish: @escaping () -> Void = {}) {
+        self.onFinish = onFinish
         _viewModel = State(initialValue: HighwayOverviewViewModel(apiClient: apiClient))
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
 
-                Group {
-                    switch viewModel.state {
-                    case .idle, .loading:
-                        loadingView
-                    case .failed:
-                        failureView
-                    case .loaded:
-                        loadedView
-                    }
+            Group {
+                switch viewModel.state {
+                case .idle, .loading:
+                    loadingView
+                case .failed:
+                    failureView
+                case .loaded:
+                    loadedView
                 }
-                .padding(.horizontal, 20)
             }
-            .navigationTitle("E-matrica")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(.horizontal, 20)
         }
+        .navigationTitle("E-matrica")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.load()
             selectDefaultVignetteIfNeeded()
@@ -153,7 +154,10 @@ struct VignetteSelectorView: View {
                             )
                         ]
                     ),
-                    onFinish: { shouldNavigateToVignetteConfirmation = false }
+                    onFinish: {
+                        shouldNavigateToVignetteConfirmation = false
+                        onFinish()
+                    }
                 )
             }
         }
@@ -180,7 +184,10 @@ struct VignetteSelectorView: View {
         .navigationDestination(isPresented: $shouldNavigateToYearlySelector) {
             YearlyVignetteSelectorView(
                 viewModel: viewModel,
-                onFinish: { shouldNavigateToYearlySelector = false }
+                onFinish: {
+                    shouldNavigateToYearlySelector = false
+                    onFinish()
+                }
             )
         }
     }
