@@ -10,6 +10,8 @@ import SwiftUI
 struct VignetteSelectorView: View {
     @State private var viewModel: HighwayOverviewViewModel
     @State private var selectedVignetteID: String?
+    @State private var shouldNavigateToVignetteConfirmation = false
+    @State private var shouldNavigateToYearlySelector = false
 
     init(apiClient: HighwayAPIClient) {
         _viewModel = State(initialValue: HighwayOverviewViewModel(apiClient: apiClient))
@@ -104,6 +106,7 @@ struct VignetteSelectorView: View {
             }
 
             Button {
+                shouldNavigateToVignetteConfirmation = true
             } label: {
                 Text("Vásárlás")
                     .font(.headline.weight(.semibold))
@@ -120,11 +123,45 @@ struct VignetteSelectorView: View {
         }
         .padding(18)
         .background(cardBackground)
+        .navigationDestination(isPresented: $shouldNavigateToVignetteConfirmation) {
+            if let selectedVignette {
+                PurchaseConfirmationView(
+                    viewModel: viewModel,
+                    vehicleInfo: viewModel.vehicleInfo,
+                    vignetteType: selectedVignetteTitle,
+                    lineItems: [
+                        .init(
+                            id: "vignette",
+                            localizedTitle: "Matrica díja",
+                            amount: selectedVignette.cost,
+                            emphasized: true
+                        ),
+                        .init(
+                            id: "fee",
+                            localizedTitle: "Rendszerhasználati díj",
+                            amount: selectedVignette.trxFee,
+                            emphasized: false
+                        ),
+                    ],
+                    totalPrice: selectedVignette.sum,
+                    requestBody: HighwayOrderRequest(
+                        highwayOrders: [
+                            HighwayOrder(
+                                type: selectedVignette.vignetteType.first ?? "",
+                                category: viewModel.vehicleInfo?.type ?? selectedVignette.vehicleCategory,
+                                cost: selectedVignette.cost
+                            )
+                        ]
+                    ),
+                    onFinish: { shouldNavigateToVignetteConfirmation = false }
+                )
+            }
+        }
     }
 
     private var countyVignettesCard: some View {
-        NavigationLink {
-            YearlyVignetteSelectorView(viewModel: viewModel)
+        Button {
+            shouldNavigateToYearlySelector = true
         } label: {
             HStack {
                 Text("Éves vármegyei matricák")
@@ -140,6 +177,12 @@ struct VignetteSelectorView: View {
             .background(cardBackground)
         }
         .buttonStyle(.plain)
+        .navigationDestination(isPresented: $shouldNavigateToYearlySelector) {
+            YearlyVignetteSelectorView(
+                viewModel: viewModel,
+                onFinish: { shouldNavigateToYearlySelector = false }
+            )
+        }
     }
 
     private func vignetteRow(_ row: VignetteRow) -> some View {
@@ -229,6 +272,14 @@ struct VignetteSelectorView: View {
 
     private var selectedVignette: HighwayVignetteOption? {
         vignetteRows.first(where: { $0.id == selectedVignetteID })?.option
+    }
+
+    private var selectedVignetteTitle: String {
+        guard let row = vignetteRows.first(where: { $0.id == selectedVignetteID }) else {
+            return ""
+        }
+
+        return row.title
     }
 
     private var cardBackground: some View {

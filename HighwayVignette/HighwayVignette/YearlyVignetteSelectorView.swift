@@ -2,16 +2,18 @@
 //  YearlyVignetteSelectorView.swift
 //  HighwayVignette
 //
-//  Created by Codex on 2026. 04. 27..
+//  Created by Gergo Gombar on 2026. 04. 27..
 //
 
 import SwiftUI
 
 struct YearlyVignetteSelectorView: View {
     let viewModel: HighwayOverviewViewModel
+    let onFinish: () -> Void
 
     @State private var selectedCountyNames: Set<String> = []
     @State private var isShowingConnectivityAlert = false
+    @State private var shouldNavigateToConfirmation = false
 
     var body: some View {
         ZStack {
@@ -55,6 +57,25 @@ struct YearlyVignetteSelectorView: View {
                 .padding(.vertical, 20)
             }
             .scrollIndicators(.hidden)
+        }
+        .navigationDestination(isPresented: $shouldNavigateToConfirmation) {
+            PurchaseConfirmationView(
+                viewModel: viewModel,
+                vehicleInfo: viewModel.vehicleInfo,
+                vignetteType: String(localized: "Éves vármegyei"),
+                lineItems: confirmationLineItems,
+                totalPrice: confirmationTotalPrice,
+                requestBody: HighwayOrderRequest(
+                    highwayOrders: selectedCountiesInDisplayOrder.map { county in
+                        HighwayOrder(
+                            type: county.id,
+                            category: viewModel.vehicleInfo?.type ?? "CAR",
+                            cost: countyPrice
+                        )
+                    }
+                ),
+                onFinish: onFinish
+            )
         }
         .navigationTitle("E-matrica")
         .navigationBarTitleDisplayMode(.inline)
@@ -155,6 +176,38 @@ struct YearlyVignetteSelectorView: View {
         Double(selectedCountyNames.count) * countyPrice
     }
 
+    private var serviceFee: Double {
+        110
+    }
+
+    private var confirmationLineItems: [PurchaseConfirmationView.LineItem] {
+        let countyItems = selectedCountiesInDisplayOrder.map { county in
+            PurchaseConfirmationView.LineItem(
+                id: county.id,
+                plainTitle: county.name,
+                amount: countyPrice,
+                emphasized: true
+            )
+        }
+
+        return countyItems + [
+            PurchaseConfirmationView.LineItem(
+                id: "fee",
+                localizedTitle: "Rendszerhasználati díj",
+                amount: serviceFee,
+                emphasized: false
+            )
+        ]
+    }
+
+    private var confirmationTotalPrice: Double {
+        totalPrice + serviceFee
+    }
+
+    private var selectedCountiesInDisplayOrder: [County] {
+        counties.filter { selectedCountyNames.contains($0.name) }
+    }
+
     private func toggleCounty(_ countyName: String) {
         if selectedCountyNames.contains(countyName) {
             selectedCountyNames.remove(countyName)
@@ -166,11 +219,16 @@ struct YearlyVignetteSelectorView: View {
     private func handleContinue() {
         let disconnectedCountyNames = disconnectedSelectedCountyNames()
 
-        guard !disconnectedCountyNames.isEmpty else {
+        guard selectedCountyNames.isEmpty == false else {
             return
         }
 
-        isShowingConnectivityAlert = true
+        guard disconnectedCountyNames.isEmpty else {
+            isShowingConnectivityAlert = true
+            return
+        }
+
+        shouldNavigateToConfirmation = true
     }
 
     private func disconnectedSelectedCountyNames() -> [String] {
@@ -246,6 +304,7 @@ struct YearlyVignetteSelectorView: View {
     YearlyVignetteSelectorView(
         viewModel: HighwayOverviewViewModel(
             apiClient: HighwayAPIClient(baseURL: URL(string: "http://0.0.0.0:8080")!)
-        )
+        ),
+        onFinish: {}
     )
 }

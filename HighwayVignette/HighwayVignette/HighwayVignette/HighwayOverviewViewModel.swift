@@ -23,6 +23,7 @@ final class HighwayOverviewViewModel {
     var state: LoadState = .idle
     var highwayInfo: HighwayInfoResponse?
     var vehicleInfo: VehicleInfoResponse?
+    var latestOrderResponse: HighwayOrderResponse?
 
     init(apiClient: any HighwayAPIClientProviding) {
         self.apiClient = apiClient
@@ -61,5 +62,11 @@ final class HighwayOverviewViewModel {
             vehicleInfo = nil
             state = .failed(error.localizedDescription)
         }
+    }
+
+    func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse {
+        let response = try await apiClient.submitOrder(requestBody)
+        latestOrderResponse = response
+        return response
     }
 }
