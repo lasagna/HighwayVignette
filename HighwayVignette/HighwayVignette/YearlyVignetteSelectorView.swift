@@ -11,6 +11,7 @@ struct YearlyVignetteSelectorView: View {
     let viewModel: HighwayOverviewViewModel
     let onFinish: () -> Void
 
+    @State private var mapData: HungaryCountyMapData?
     @State private var selectedCountyNames: Set<String> = []
     @State private var isShowingConnectivityAlert = false
     @State private var shouldNavigateToConfirmation = false
@@ -83,13 +84,26 @@ struct YearlyVignetteSelectorView: View {
             Button("Rendben", role: .cancel) {
             }
         }
+        .task {
+            if mapData == nil {
+                mapData = try? await HungaryCountyMapStore.shared.loadMapData()
+            }
+        }
     }
 
     private var countyMap: some View {
-        HungaryCountyMapView(selectedCountyIDs: selectedCountyIDs)
-            .frame(maxWidth: .infinity, maxHeight: 220)
-            .aspectRatio(1.45, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        Group {
+            if let mapData {
+                HungaryCountyMapView(mapData: mapData, selectedCountyIDs: selectedCountyIDs)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.secondarySystemGroupedBackground))
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: 220)
+        .aspectRatio(1.45, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private var countyList: some View {
@@ -217,6 +231,10 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private func handleContinue() {
+        guard mapData != nil else {
+            return
+        }
+
         let disconnectedCountyNames = disconnectedSelectedCountyNames()
 
         guard selectedCountyNames.isEmpty == false else {
@@ -232,6 +250,10 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private func disconnectedSelectedCountyNames() -> [String] {
+        guard let adjacencyGraph = mapData?.adjacencyGraph else {
+            return []
+        }
+
         let selectedIDs = selectedCountyIDs
 
         guard selectedIDs.count > 1, let startID = selectedIDs.first else {
@@ -250,7 +272,7 @@ struct YearlyVignetteSelectorView: View {
 
             visited.insert(currentID)
 
-            for neighbor in HungaryCountyMapView.adjacencyGraph[currentID, default: []] where selectedIDs.contains(neighbor) {
+            for neighbor in adjacencyGraph[currentID, default: []] where selectedIDs.contains(neighbor) {
                 if !visited.contains(neighbor) {
                     queue.append(neighbor)
                 }
