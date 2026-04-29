@@ -38,7 +38,7 @@ actor HungaryCountyMapStore {
     private var cachedMapData: HungaryCountyMapData?
     private var loadingTask: Task<HungaryCountyMapData, Error>?
 
-    func loadMapData() async throws -> HungaryCountyMapData {
+    func loadMapDataIfNeeded() async throws -> HungaryCountyMapData {
         if let cachedMapData {
             return cachedMapData
         }

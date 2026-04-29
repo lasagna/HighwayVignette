@@ -11,7 +11,7 @@ struct YearlyVignetteSelectorView: View {
     let viewModel: HighwayOverviewViewModel
     let onFinish: () -> Void
 
-    @State private var mapData: HungaryCountyMapData?
+    @State private var countyMapData: HungaryCountyMapData?
     @State private var selectedCountyNames: Set<String> = []
     @State private var isShowingConnectivityAlert = false
     @State private var shouldNavigateToConfirmation = false
@@ -85,16 +85,16 @@ struct YearlyVignetteSelectorView: View {
             }
         }
         .task {
-            if mapData == nil {
-                mapData = try? await HungaryCountyMapStore.shared.loadMapData()
+            if countyMapData == nil {
+                countyMapData = try? await HungaryCountyMapStore.shared.loadMapDataIfNeeded()
             }
         }
     }
 
     private var countyMap: some View {
         Group {
-            if let mapData {
-                HungaryCountyMapView(mapData: mapData, selectedCountyIDs: selectedCountyIDs)
+            if let countyMapData {
+                HungaryCountyMapView(mapData: countyMapData, selectedCountyIDs: selectedCountyIDs)
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -231,7 +231,7 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private func handleContinue() {
-        guard mapData != nil else {
+        guard countyMapData != nil else {
             return
         }
 
@@ -250,7 +250,7 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private func disconnectedSelectedCountyNames() -> [String] {
-        guard let adjacencyGraph = mapData?.adjacencyGraph else {
+        guard let adjacencyGraph = countyMapData?.adjacencyGraph else {
             return []
         }
 
