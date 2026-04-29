@@ -34,7 +34,7 @@ struct PurchaseConfirmationView: View {
                             .font(.title2.weight(.bold))
                             .foregroundStyle(Color(red: 0.05, green: 0.18, blue: 0.30))
 
-                        detailRow("Rendszám", formattedPlate(vehicleInfo?.plate))
+                        detailRow("Rendszám", (vehicleInfo?.plate).formattedPlateOrPlaceholder)
                         detailRow("Matrica típusa", vignetteType)
                     }
 
@@ -53,7 +53,7 @@ struct PurchaseConfirmationView: View {
                             .font(.headline.weight(.semibold))
                             .foregroundStyle(Color(red: 0.05, green: 0.18, blue: 0.30))
 
-                        Text(priceText(totalPrice))
+                        Text(totalPrice.formattedForints)
                             .font(.system(size: 34, weight: .bold))
                             .foregroundStyle(Color(red: 0.05, green: 0.18, blue: 0.30))
                     }
@@ -149,28 +149,10 @@ struct PurchaseConfirmationView: View {
 
             Spacer(minLength: 16)
 
-            Text(priceText(item.amount))
+            Text(item.amount.formattedForints)
                 .font(.title3.weight(.medium))
                 .foregroundStyle(Color(red: 0.28, green: 0.38, blue: 0.49))
         }
-    }
-
-    private func priceText(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = " "
-        formatter.maximumFractionDigits = 0
-
-        let amount = formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
-        return "\(amount) Ft"
-    }
-
-    private func formattedPlate(_ plate: String?) -> String {
-        guard let plate else {
-            return "-"
-        }
-
-        return plate.replacingOccurrences(of: "-", with: " ").uppercased()
     }
 
     private func submitOrder() {

@@ -22,6 +22,13 @@ nonisolated struct HighwayInfoPayload: Codable, Equatable {
     let highwayVignettes: [HighwayVignetteOption]
     let vehicleCategories: [VehicleCategory]
     let counties: [County]
+
+    func yearlyCountyVignette(for vehicleCategory: String) -> HighwayVignetteOption? {
+        highwayVignettes.first { option in
+            option.vehicleCategory.caseInsensitiveCompare(vehicleCategory) == .orderedSame
+            && option.vignetteType.contains { $0.caseInsensitiveCompare("YEAR") == .orderedSame }
+        }
+    }
 }
 
 nonisolated struct HighwayVignetteOption: Codable, Equatable {

@@ -80,7 +80,7 @@ struct VignetteSelectorView: View {
                         .frame(width: 34, height: 34)
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(formattedPlate(vehicleInfo.plate))
+                        Text(vehicleInfo.plate.formattedPlate)
                             .font(.headline)
                         Text(vehicleInfo.name)
                             .font(.subheadline)
@@ -209,7 +209,7 @@ struct VignetteSelectorView: View {
 
                 Spacer(minLength: 12)
 
-                Text(priceText(for: row.option.sum))
+                Text(row.option.sum.formattedForints)
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.primary)
             }
@@ -302,13 +302,6 @@ struct VignetteSelectorView: View {
         selectedVignetteID = first.id
     }
 
-    private func formattedPlate(_ plate: String) -> String {
-        plate.replacingOccurrences(of: "-", with: " ").uppercased()
-    }
-
-    private func priceText(for value: Double) -> String {
-        "\(Int(value)) Ft"
-    }
 }
 
 private struct VignetteRow: Identifiable {

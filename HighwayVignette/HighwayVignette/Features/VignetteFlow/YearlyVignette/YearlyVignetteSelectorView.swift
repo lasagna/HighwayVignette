@@ -35,7 +35,7 @@ struct YearlyVignetteSelectorView: View {
                         Text("Fizetendő összeg")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
-                        Text(priceText(totalPrice))
+                        Text(totalPrice.formattedForints)
                             .font(.system(size: 24, weight: .bold, design: .default))
                             .foregroundStyle(Color(red: 0.05, green: 0.18, blue: 0.30))
                     }
@@ -70,7 +70,7 @@ struct YearlyVignetteSelectorView: View {
                     highwayOrders: selectedCountiesInDisplayOrder.map { county in
                         HighwayOrder(
                             type: county.id,
-                            category: viewModel.vehicleInfo?.type ?? "CAR",
+                            category: selectedVehicleCategory,
                             cost: countyPrice
                         )
                     }
@@ -133,7 +133,7 @@ struct YearlyVignetteSelectorView: View {
 
                         Spacer()
 
-                        Text(priceText(countyPrice))
+                        Text(countyPrice.formattedForints)
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(Color(red: 0.05, green: 0.18, blue: 0.30))
                     }
@@ -179,7 +179,7 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private var countyPrice: Double {
-        5450
+        yearlyCountyVignette?.cost ?? 0
     }
 
     private var selectedCountyIDs: Set<String> {
@@ -191,7 +191,15 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private var serviceFee: Double {
-        110
+        yearlyCountyVignette?.trxFee ?? 0
+    }
+
+    private var yearlyCountyVignette: HighwayVignetteOption? {
+        viewModel.highwayInfo?.payload.yearlyCountyVignette(for: selectedVehicleCategory)
+    }
+
+    private var selectedVehicleCategory: String {
+        viewModel.vehicleInfo?.type ?? "CAR"
     }
 
     private var confirmationLineItems: [PurchaseConfirmationView.LineItem] {
@@ -260,15 +268,6 @@ struct YearlyVignetteSelectorView: View {
         )
     }
 
-    private func priceText(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.groupingSeparator = " "
-        formatter.maximumFractionDigits = 0
-
-        let amount = formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
-        return "\(amount) Ft"
-    }
 }
 
 #Preview {

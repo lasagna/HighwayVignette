@@ -70,6 +70,34 @@ struct HighwayVignetteTests {
         #expect(viewModel.vehicleInfo?.plate == "abc-123")
     }
 
+    @Test func resolvesYearlyCountyVignetteForVehicleCategory() {
+        let payload = HighwayInfoPayload(
+            highwayVignettes: [
+                HighwayVignetteOption(
+                    vignetteType: ["DAY"],
+                    vehicleCategory: "CAR",
+                    cost: 5150,
+                    trxFee: 200,
+                    sum: 5350
+                ),
+                HighwayVignetteOption(
+                    vignetteType: ["YEAR"],
+                    vehicleCategory: "CAR",
+                    cost: 5450,
+                    trxFee: 110,
+                    sum: 5560
+                ),
+            ],
+            vehicleCategories: [],
+            counties: []
+        )
+
+        let option = payload.yearlyCountyVignette(for: "car")
+
+        #expect(option?.cost == 5450)
+        #expect(option?.trxFee == 110)
+    }
+
 }
 
 private struct MockHighwayAPIClient: HighwayAPIClientProviding {
