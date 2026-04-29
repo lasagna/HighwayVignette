@@ -1,5 +1,5 @@
 //
-//  HighwayOverviewViewModel.swift
+//  HighwayViewModel.swift
 //  HighwayVignette
 //
 //  Created by Gergo Gombar on 2026. 04. 24..
@@ -10,7 +10,7 @@ import Observation
 
 @MainActor
 @Observable
-final class HighwayOverviewViewModel {
+final class HighwayViewModel {
     enum LoadState: Equatable {
         case idle
         case loading

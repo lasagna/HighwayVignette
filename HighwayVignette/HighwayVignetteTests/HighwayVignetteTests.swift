@@ -61,7 +61,7 @@ struct HighwayVignetteTests {
 
     @MainActor
     @Test func loadsOverviewData() async {
-        let viewModel = HighwayOverviewViewModel(apiClient: MockHighwayAPIClient())
+        let viewModel = HighwayViewModel(apiClient: MockHighwayAPIClient())
 
         await viewModel.load()
 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct YearlyVignetteSelectorView: View {
-    let viewModel: HighwayOverviewViewModel
+    let viewModel: HighwayViewModel
     let onFinish: () -> Void
 
     @State private var countyMapData: HungaryCountyMapData?
@@ -273,7 +273,7 @@ struct YearlyVignetteSelectorView: View {
 
 #Preview {
     YearlyVignetteSelectorView(
-        viewModel: HighwayOverviewViewModel(
+        viewModel: HighwayViewModel(
             apiClient: HighwayAPIClient(baseURL: URL(string: "http://0.0.0.0:8080")!)
         ),
         onFinish: {}

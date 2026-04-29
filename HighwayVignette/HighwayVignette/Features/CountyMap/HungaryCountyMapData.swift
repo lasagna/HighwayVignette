@@ -2,7 +2,7 @@
 //  HungaryCountyMapData.swift
 //  HighwayVignette
 //
-//  Created by Codex on 2026. 04. 28..
+//  Created by Gergo Gombar on 2026. 04. 28..
 //
 
 import CoreGraphics

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PurchaseConfirmationView: View {
-    let viewModel: HighwayOverviewViewModel
+    let viewModel: HighwayViewModel
     let vehicleInfo: VehicleInfoResponse?
     let vignetteType: String
     let lineItems: [LineItem]
@@ -234,7 +234,7 @@ extension PurchaseConfirmationView {
 
 #Preview("National") {
     PurchaseConfirmationView(
-        viewModel: HighwayOverviewViewModel(
+        viewModel: HighwayViewModel(
             apiClient: HighwayAPIClient(baseURL: URL(string: "http://0.0.0.0:8080")!)
         ),
         vehicleInfo: VehicleInfoResponse(
@@ -259,7 +259,7 @@ extension PurchaseConfirmationView {
 
 #Preview("Yearly County") {
     PurchaseConfirmationView(
-        viewModel: HighwayOverviewViewModel(
+        viewModel: HighwayViewModel(
             apiClient: HighwayAPIClient(baseURL: URL(string: "http://0.0.0.0:8080")!)
         ),
         vehicleInfo: VehicleInfoResponse(

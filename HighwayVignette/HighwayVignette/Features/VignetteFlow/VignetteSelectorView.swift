@@ -10,14 +10,14 @@ import SwiftUI
 struct VignetteSelectorView: View {
     let onFinish: () -> Void
 
-    @State private var viewModel: HighwayOverviewViewModel
+    @State private var viewModel: HighwayViewModel
     @State private var selectedVignetteID: String?
     @State private var shouldNavigateToVignetteConfirmation = false
     @State private var shouldNavigateToYearlySelector = false
 
     init(apiClient: HighwayAPIClient, onFinish: @escaping () -> Void = {}) {
         self.onFinish = onFinish
-        _viewModel = State(initialValue: HighwayOverviewViewModel(apiClient: apiClient))
+        _viewModel = State(initialValue: HighwayViewModel(apiClient: apiClient))
     }
 
     var body: some View {
