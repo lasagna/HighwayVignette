@@ -7,7 +7,7 @@
 
 import CoreGraphics
 
-enum HungaryCountyMapAdjacencyBuilder {
+nonisolated enum HungaryCountyMapAdjacencyBuilder {
     private struct LineSegment {
         let start: CGPoint
         let end: CGPoint

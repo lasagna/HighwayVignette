@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum YearlyCountyIdentityMapper {
+nonisolated enum YearlyCountyIdentityMapper {
     static let countyIDByName: [String: String] = [
         "Bács-Kiskun": "bk",
         "Baranya": "baranya",
@@ -35,7 +35,7 @@ enum YearlyCountyIdentityMapper {
     )
 }
 
-enum YearlyCountySelectionValidator {
+nonisolated enum YearlyCountySelectionValidator {
     static func disconnectedSelectedCountyNames(
         selectedCountyIDs: Set<String>,
         adjacencyGraph: [String: Set<String>]

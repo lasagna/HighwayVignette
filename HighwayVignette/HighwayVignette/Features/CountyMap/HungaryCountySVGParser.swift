@@ -8,7 +8,7 @@
 import Foundation
 import CoreGraphics
 
-enum HungaryCountySVGParser {
+nonisolated enum HungaryCountySVGParser {
     static func parseBundledMap() throws -> HungaryCountyMapData {
         guard let url = Bundle.main.url(forResource: "HU_counties_blank", withExtension: "svg") else {
             throw SVGParserError.missingResource

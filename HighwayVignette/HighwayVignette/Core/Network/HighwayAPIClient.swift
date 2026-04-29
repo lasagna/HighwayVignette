@@ -8,9 +8,9 @@
 import Foundation
 
 protocol HighwayAPIClientProviding {
-    func fetchHighwayInfo() async throws -> HighwayInfoResponse
-    func fetchVehicleInfo() async throws -> VehicleInfoResponse
-    func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse
+    nonisolated func fetchHighwayInfo() async throws -> HighwayInfoResponse
+    nonisolated func fetchVehicleInfo() async throws -> VehicleInfoResponse
+    nonisolated func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse
 }
 
 struct HighwayAPIClient {
@@ -31,7 +31,7 @@ struct HighwayAPIClient {
         self.encoder = encoder
     }
 
-    func fetchHighwayInfo() async throws -> HighwayInfoResponse {
+    nonisolated func fetchHighwayInfo() async throws -> HighwayInfoResponse {
         try await performRequest(
             path: "/v1/highway/info",
             method: "GET",
@@ -39,7 +39,7 @@ struct HighwayAPIClient {
         )
     }
 
-    func fetchVehicleInfo() async throws -> VehicleInfoResponse {
+    nonisolated func fetchVehicleInfo() async throws -> VehicleInfoResponse {
         try await performRequest(
             path: "/v1/highway/vehicle",
             method: "GET",
@@ -47,7 +47,7 @@ struct HighwayAPIClient {
         )
     }
 
-    func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse {
+    nonisolated func submitOrder(_ requestBody: HighwayOrderRequest) async throws -> HighwayOrderResponse {
         let body = try encoder.encode(requestBody)
 
         do {
@@ -67,7 +67,7 @@ struct HighwayAPIClient {
         }
     }
 
-    private func performRequest<Response: Decodable>(
+    private nonisolated func performRequest<Response: Decodable>(
         path: String,
         method: String,
         body: Data? = nil,
@@ -91,7 +91,7 @@ struct HighwayAPIClient {
         }
     }
 
-    private func makeRequest(path: String, method: String, body: Data?) throws -> URLRequest {
+    private nonisolated func makeRequest(path: String, method: String, body: Data?) throws -> URLRequest {
         guard let url = URL(string: path, relativeTo: baseURL) else {
             throw HighwayAPIError.invalidURL(path)
         }
@@ -118,7 +118,7 @@ enum HighwayAPIError: Error, LocalizedError {
     case decodingFailed(Error)
     case orderRejected(HighwayOrderErrorResponse)
 
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case let .invalidURL(path):
             return "Invalid URL for path: \(path)"
