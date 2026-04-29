@@ -183,7 +183,7 @@ struct YearlyVignetteSelectorView: View {
     }
 
     private var selectedCountyIDs: Set<String> {
-        Set(selectedCountyNames.compactMap { Self.countyIDByName[$0] })
+        Set(selectedCountyNames.compactMap { YearlyCountyIdentityMapper.countyIDByName[$0] })
     }
 
     private var totalPrice: Double {
@@ -254,35 +254,10 @@ struct YearlyVignetteSelectorView: View {
             return []
         }
 
-        let selectedIDs = selectedCountyIDs
-
-        guard selectedIDs.count > 1, let startID = selectedIDs.first else {
-            return []
-        }
-
-        var visited: Set<String> = []
-        var queue: [String] = [startID]
-
-        while let currentID = queue.first {
-            queue.removeFirst()
-
-            guard !visited.contains(currentID) else {
-                continue
-            }
-
-            visited.insert(currentID)
-
-            for neighbor in adjacencyGraph[currentID, default: []] where selectedIDs.contains(neighbor) {
-                if !visited.contains(neighbor) {
-                    queue.append(neighbor)
-                }
-            }
-        }
-
-        return selectedIDs
-            .subtracting(visited)
-            .compactMap { Self.countyNameByID[$0] }
-            .sorted()
+        return YearlyCountySelectionValidator.disconnectedSelectedCountyNames(
+            selectedCountyIDs: selectedCountyIDs,
+            adjacencyGraph: adjacencyGraph
+        )
     }
 
     private func priceText(_ value: Double) -> String {
@@ -294,32 +269,6 @@ struct YearlyVignetteSelectorView: View {
         let amount = formatter.string(from: NSNumber(value: value)) ?? "\(Int(value))"
         return "\(amount) Ft"
     }
-
-    private static let countyIDByName: [String: String] = [
-        "Bács-Kiskun": "bk",
-        "Baranya": "baranya",
-        "Borsod-Abaúj-Zemplén": "baz",
-        "Budapest": "budapest",
-        "Csongrád": "csongrad",
-        "Fejér": "fejer",
-        "Győr-Moson-Sopron": "gyms",
-        "Hajdú-Bihar": "hb",
-        "Heves": "heves",
-        "Jász-Nagykun-Szolnok": "jnsz",
-        "Komárom-Esztergom": "ke",
-        "Nógrád": "nograd",
-        "Pest": "pest",
-        "Somogy": "somogy",
-        "Szabolcs-Szatmár-Bereg": "szszb",
-        "Tolna": "tolna",
-        "Vas": "vas",
-        "Veszprém": "veszprem",
-        "Zala": "zala",
-    ]
-
-    private static let countyNameByID: [String: String] = Dictionary(
-        uniqueKeysWithValues: countyIDByName.map { ($1, $0) }
-    )
 }
 
 #Preview {
