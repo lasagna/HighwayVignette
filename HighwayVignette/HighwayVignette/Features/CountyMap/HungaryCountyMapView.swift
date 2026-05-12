@@ -10,6 +10,7 @@ import SwiftUI
 struct HungaryCountyMapView: View {
     let mapData: HungaryCountyMapData
     let selectedCountyIDs: Set<String>
+    let onCountyTap: (String) -> Void
 
     var body: some View {
         GeometryReader { geometry in
@@ -17,14 +18,20 @@ struct HungaryCountyMapView: View {
 
             ZStack {
                 ForEach(mapData.counties) { county in
-                    transformedPath(for: county.contours, in: drawingFrame)
+                    let countyPath = transformedPath(for: county.contours, in: drawingFrame)
+
+                    countyPath
                         .fill(
                             selectedCountyIDs.contains(county.id)
                             ? Color(red: 0.72, green: 1.0, blue: 0.0)
                             : Color(red: 0.78, green: 0.87, blue: 0.92)
                         )
+                        .contentShape(countyPath)
+                        .onTapGesture {
+                            onCountyTap(county.id)
+                        }
 
-                    transformedPath(for: county.contours, in: drawingFrame)
+                    countyPath
                         .stroke(.white, lineWidth: 1.6)
                 }
 
@@ -103,7 +110,8 @@ struct HungaryCountyMapView: View {
 #Preview {
     HungaryCountyMapView(
         mapData: HungaryCountyMapStore.previewData,
-        selectedCountyIDs: ["baranya", "fejer", "gyms", "pest"]
+        selectedCountyIDs: ["baranya", "fejer", "gyms", "pest"],
+        onCountyTap: { _ in }
     )
     .frame(height: 220)
     .padding()

@@ -94,7 +94,11 @@ struct YearlyVignetteSelectorView: View {
     private var countyMap: some View {
         Group {
             if let countyMapData {
-                HungaryCountyMapView(mapData: countyMapData, selectedCountyIDs: selectedCountyIDs)
+                HungaryCountyMapView(
+                    mapData: countyMapData,
+                    selectedCountyIDs: selectedCountyIDs,
+                    onCountyTap: toggleCounty(id:)
+                )
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -236,6 +240,14 @@ struct YearlyVignetteSelectorView: View {
         } else {
             selectedCountyNames.insert(countyName)
         }
+    }
+
+    private func toggleCounty(id countyID: String) {
+        guard let countyName = YearlyCountyIdentityMapper.countyNameByID[countyID] else {
+            return
+        }
+
+        toggleCounty(countyName)
     }
 
     private func handleContinue() {
